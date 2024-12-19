@@ -4,15 +4,37 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const stockRoutes = require("./routes/stocks");
 
+// Swagger Setup
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Swagger definition
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Portfolio Backend API',
+      version: '1.0.0',
+      description: 'API for managing portfolio stocks'
+    },
+  },
+  apis: ['./routes/*.js'],  // Path to the API route files
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Serve Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use("/api/stocks", stockRoutes);
